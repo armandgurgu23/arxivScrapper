@@ -3,9 +3,12 @@ from urllib import request
 
 
 class ArxivQueryEngine(object):
-    def __init__(self, maxResults, queriesFile):
+    def __init__(self, maxResults, queriesFilePath):
         self.maxResults = maxResults
-        self.queriesFile = queriesFile
+        self.queriesFilePath = queriesFilePath
+
+    def openQueriesFile(self, path):
+        pass
 
     def fetchSingleSearchQuery(self, queryString):
         sampleUrl = 'http://export.arxiv.org/api/query?search_query=all:{}&start=0&max_results={}'.format(
