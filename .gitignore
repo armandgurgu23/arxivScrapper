@@ -1,1 +1,5 @@
 **/*_armand_dev.py
+**/*.pdf
+*.pdf
+.DS_Store
+**/.DS_Store
