@@ -7,6 +7,7 @@ _C.queryEngine.maxResults = 10
 _C.queryEngine.requestPauseTime = 1
 _C.datasetGenerator = CN()
 _C.datasetGenerator.outputPath = ''
+_C.datasetGenerator.generatePdfData = False
 
 
 def getYamlConfigFile(yamlFilePath):

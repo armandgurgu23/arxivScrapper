@@ -2,6 +2,7 @@ from config.scrapperDefaults import getYamlConfigFile
 from queryEngine.queryEngine import ArxivQueryEngine
 from arxivXMLParser.arxivXMLParser import ArxivXMLParser
 from datasetGenerator.datasetGenerator import DatasetGenerator
+from arxivPdfEngine.arxivPdfEngine import ArxivPdfEngine
 import argparse
 
 # Wrapper class that handlers executing
@@ -14,43 +15,24 @@ class ScrapperHandler(object):
 
     def __call__(self):
         yamlConfig = self.getYamlConfigFileWrapper(self.scrapperArgs)
-        # print('The yaml config I read in: \n')
-        # print(yamlConfig)
         arxivQueryEngineObject = self.getArxivQueryEngineWrapper(
             yamlConfig.queryEngine.maxResults, yamlConfig.queryEngine.queryFile)
         datasetGeneratorObject = self.getDatasetGeneratorWrapper(
             outputPath=yamlConfig.datasetGenerator.outputPath)
+        arxivPdfEngineObject = self.getArxivPdfEngineWrapper()
         self.runScraperAndGenerateDataset(
-            yamlConfig, arxivQueryEngineObject, datasetGeneratorObject)
-        # print('Query file search terms I read in: \n')
-        # print(arxivQueryEngineObject.queriesToFetch)
-        # sampleQueryResult = arxivQueryEngineObject.fetchSingleSearchQuery(
-        #     queryString=arxivQueryEngineObject.queriesToFetch[0])
-        # parsedQueryResult = self.getArxivXMLParserWrapper(
-        #     sampleQueryResult, yamlConfig.queryEngine.maxResults, arxivQueryEngineObject.queriesToFetch[0])
-        # summaries, entries = parsedQueryResult.extractSummariesFromEntries(
-        #     parsedQueryResult.xmlElementTree)
-        # pdfLinks = parsedQueryResult.extractPaperPdfURLsFromEntries(entries)
-        # print(summaries)
-        # print(summaries.keys())
-        # print('The summaries are above! ')
-        # print(pdfLinks)
-        # print('The pdf links are above! ')
-        # print(summaries['electron_0'])
-        # print(pdfLinks['electron_0'])
-        # print('Sample summary and URL above! ')
+            yamlConfig, arxivQueryEngineObject, datasetGeneratorObject, arxivPdfEngineObject)
         return
 
-    def runScraperAndGenerateDataset(self, yamlConfig, arxivQueryEngineObject, datasetGeneratorObject):
+    def runScraperAndGenerateDataset(self, yamlConfig, arxivQueryEngineObject, datasetGeneratorObject, arxivPdfEngineObject):
         for rawQueryResult, currentQuery in arxivQueryEngineObject:
             parsedQueryResult = self.getArxivXMLParserWrapper(
                 rawQueryResult, yamlConfig.queryEngine.maxResults, currentQuery)
             summaries, entries = parsedQueryResult.extractSummariesFromEntries(
                 parsedQueryResult.xmlElementTree)
             pdfLinks = parsedQueryResult.extractPaperPdfURLsFromEntries(entries)
-            # TO DO: implement arxiv pdf engine logic and run it inside data
-            # generator __call__ method.
-            datasetGeneratorObject(summaries, generatePdfData=False, arxivPdfEngine=None)
+            datasetGeneratorObject(summaries, generatePdfData=True,
+                                   arxivPdfEngine=arxivPdfEngineObject, pdfLinks=pdfLinks)
         print('Finished running scraper and generated dataset at {}!'.format(
             yamlConfig.datasetGenerator.outputPath))
         return
@@ -67,9 +49,13 @@ class ScrapperHandler(object):
     def getDatasetGeneratorWrapper(self, outputPath):
         return DatasetGenerator(outputPath=outputPath)
 
+    def getArxivPdfEngineWrapper(self):
+        return ArxivPdfEngine()
+
 
 def getScrapperArguments():
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(
+        description='Program that scrapes research papers natural language text from arxiv.org.')
     parser.add_argument('--scrapperYaml', type=str, default='config/scrapperConfig.yaml',
                         help='Path to the yaml file describing the scrapper configuration.')
     return parser.parse_args()

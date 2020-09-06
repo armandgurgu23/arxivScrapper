@@ -12,9 +12,46 @@ class DatasetGenerator(object):
         # where the dataset will be generated.
         self.createFolder(self.outputPath)
 
-    def __call__(self, summaries, generatePdfData=False, arxivPdfEngine=None):
-        self.createFolderStructureQuery(summaries)
-        raise NotImplementedError('Finish implementing the actual saving schema for data here.')
+    def __call__(self, summaries, generatePdfData=False, arxivPdfEngine=None, pdfLinks=None):
+        queryFoldersInfo = self.createFolderStructureQuery(summaries)
+        self.writeSummariesToDatasetPath(summaries, queryFoldersInfo)
+        if generatePdfData:
+            print('Starting to generate PDFs for: {}'.format(queryFoldersInfo))
+            self.writePdfContentsToDatasetPath(arxivPdfEngine, pdfLinks, queryFoldersInfo)
+        return
+
+    def writePdfContentsToDatasetPath(self, arxivPdfEngine, pdfLinks, queryFoldersInfo):
+        for currQueryFolderName in queryFoldersInfo:
+            currLinkPdf = pdfLinks[currQueryFolderName][0]
+            # Insert logic to run the arxivPdfEngine on
+            # the current PDF link here.
+            currPdfContents = arxivPdfEngine.fetchRawPdfContentsFromUrl(currLinkPdf)
+            summaryStorePath = self.makeQuerySubFolderPath(currQueryFolderName)
+            pdfFilePath = self.writeStringContentsToRawFile(
+                currPdfContents, summaryStorePath, suffixPath='paper.pdf', writeMode='wb')
+            # Parse the natural language text from the PDF.
+            pdfTextContents = arxivPdfEngine.extractPdfTextFromDocument(pdfFilePath)
+            self.writeStringContentsToRawFile(
+                pdfTextContents, summaryStorePath, suffixPath='paper.txt', writeMode='w')
+        return
+
+    def makeQuerySubFolderPath(self, currQueryFolderName):
+        queryName, subFolderIndex = currQueryFolderName.split('_')
+        summaryStorePath = os.path.join(self.outputPath, queryName, subFolderIndex)
+        return summaryStorePath
+
+    def writeSummariesToDatasetPath(self, summaries, queryFoldersInfo):
+        for currQueryFolderName in queryFoldersInfo:
+            summaryText = summaries[currQueryFolderName][0]
+            summaryStorePath = self.makeQuerySubFolderPath(currQueryFolderName)
+            self.writeStringContentsToRawFile(summaryText, summaryStorePath)
+        return
+
+    def writeStringContentsToRawFile(self, fileContents, prefixPath, suffixPath='summary.txt', writeMode='w'):
+        outputFilePath = os.path.join(prefixPath, suffixPath)
+        with open(outputFilePath, writeMode) as fileObject:
+            fileObject.write(fileContents)
+        return outputFilePath
 
     def createFolder(self, path):
         if not os.path.exists(path):
@@ -24,8 +61,7 @@ class DatasetGenerator(object):
     def createFolderStructureQuery(self, summaries):
         # Given the summaries for a particular query term.
         # this method creates the folder structure for that query.
-        self.createDefaultFolderStructure(summaries)
-        return
+        return self.createDefaultFolderStructure(summaries)
 
     def createDefaultFolderStructure(self, summaries):
         queryFoldersInfo = list(summaries.keys())
@@ -34,7 +70,7 @@ class DatasetGenerator(object):
             subFolderIndex = subFolderName.split('_')[1]
             subFolderPath = os.path.join(queryFolderPath, subFolderIndex)
             self.createFolder(subFolderPath)
-        return
+        return queryFoldersInfo
 
     def createQueryFolder(self, sampleQueryName):
         suffixPath = sampleQueryName.split('_')[0]
