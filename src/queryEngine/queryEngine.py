@@ -10,6 +10,10 @@ class ArxivQueryEngine(object):
         # in the yaml config.
         self.queriesToFetch = self.openQueriesFile(self.queriesFilePath)
 
+    def __iter__(self):
+        for currQuery in self.queriesToFetch:
+            yield self.fetchSingleSearchQuery(currQuery), currQuery
+
     def openQueriesFile(self, path):
         allQueryTerms = []
         with open(path, 'r') as fileObj:

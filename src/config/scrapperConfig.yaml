@@ -2,3 +2,5 @@ queryEngine:
   queryFile: 'queryEngine/queryFiles/sampleQueryFile.txt'
   maxResults: 5
   requestPauseTime: 2
+datasetGenerator:
+  outputPath: 'scrapedDataset'

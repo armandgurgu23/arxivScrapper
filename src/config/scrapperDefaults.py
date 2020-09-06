@@ -5,7 +5,8 @@ _C.queryEngine = CN()
 _C.queryEngine.queryFile = ''
 _C.queryEngine.maxResults = 10
 _C.queryEngine.requestPauseTime = 1
-_C.xmlParser = CN()
+_C.datasetGenerator = CN()
+_C.datasetGenerator.outputPath = ''
 
 
 def getYamlConfigFile(yamlFilePath):
