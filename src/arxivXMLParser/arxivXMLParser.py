@@ -21,16 +21,48 @@ class ArxivXMLParser(object):
             len(entryElements), self.maxResults)
         return entryElements
 
-    def extractSummariesFromEntries(self, elementTree):
+    def extractPaperPdfURLsFromEntries(self, entries):
+        allPdfElements = self.findLinkElements(entries)
+        return self.extractPdfUrlsFromPdfElements(allPdfElements)
+
+    def extractPdfUrlsFromPdfElements(self, allPdfElements):
+        pdfUrlDict = {}
+        for elemIndex, currPdfElem in enumerate(allPdfElements):
+            pdfUrlDict['{}_{}'.format(self.queryEntry, elemIndex)] = [currPdfElem.attrib['href']]
+        return pdfUrlDict
+
+    def findLinkElements(self, entries):
+        linkElements = []
+        for currEntry in entries:
+            currEntryChildren = self.getEntryElementChildren(currEntry)
+            candidateLinks = self.findElementTypeFromChildren(currEntryChildren, 'link')
+            selectedLink = self.selectValidLinkElement(candidateLinks)
+            linkElements.append(selectedLink)
+        return linkElements
+
+    def selectValidLinkElement(self, candidateLinks):
+        validLinkElements = []
+        for currLink in candidateLinks:
+            linkAttributes = currLink.attrib
+            if 'href' in linkAttributes and 'pdf' in linkAttributes['href']:
+                validLinkElements.append(currLink)
+        assert len(validLinkElements) == 1, 'Something went wrong! Filtering produced these many valid link elements = {}'.format(
+            validLinkElements)
+        return validLinkElements[0]
+
+    def extractSummariesFromEntries(self, elementTree, returnEntries=True):
         entryElements = self.findAllEntryElements(elementTree)
-        # print('The entry elements for query {}: \n'.format(self.queryEntry))
-        # print(entryElements)
-        # print(len(entryElements))
         summaryElements = self.findSummaryElements(entryElements)
-        # print('The summary elements for query {}: \n'.format(self.queryEntry))
-        # print(summaryElements)
-        # print(len(summaryElements))
-        return
+        if returnEntries:
+            return self.extractSummaryTextFromSummary(summaryElements), entryElements
+        else:
+            return self.extractSummaryTextFromSummary(summaryElements)
+
+    def extractSummaryTextFromSummary(self, summaryElements):
+        summaryDict = {}
+        for elemIndex, currSummary in enumerate(summaryElements):
+            summaryDict['{}_{}'.format(self.queryEntry, elemIndex)] = [currSummary.text]
+        return summaryDict
 
     def findSummaryElements(self, entryElements):
         summaryElements = []

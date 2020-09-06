@@ -23,8 +23,17 @@ class ScrapperHandler(object):
             queryString=arxivQueryEngineObject.queriesToFetch[0])
         parsedQueryResult = self.getArxivXMLParserWrapper(
             sampleQueryResult, yamlConfig.queryEngine.maxResults, arxivQueryEngineObject.queriesToFetch[0])
-        summaryQuery = parsedQueryResult.extractSummariesFromEntries(
+        summaries, entries = parsedQueryResult.extractSummariesFromEntries(
             parsedQueryResult.xmlElementTree)
+        pdfLinks = parsedQueryResult.extractPaperPdfURLsFromEntries(entries)
+        print(summaries)
+        print(summaries.keys())
+        print('The summaries are above! ')
+        print(pdfLinks)
+        print('The pdf links are above! ')
+        print(summaries['electron_0'])
+        print(pdfLinks['electron_0'])
+        print('Sample summary and URL above! ')
         return
 
     def getYamlConfigFileWrapper(self, scrapperArgs):
