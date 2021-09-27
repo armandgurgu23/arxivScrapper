@@ -9,6 +9,10 @@ class ArxivQueryEngine(object):
         # Reads in queries from the query file specified
         # in the yaml config.
         self.queriesToFetch = self.openQueriesFile(self.queriesFilePath)
+    
+    @property
+    def total_queries_to_fetch(self):
+        return len(self.queriesToFetch) * self.maxResults
 
     def __iter__(self):
         for currQuery in self.queriesToFetch:
