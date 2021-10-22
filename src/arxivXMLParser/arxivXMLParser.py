@@ -15,10 +15,13 @@ class ArxivXMLParser(object):
         rawElements = elementTree.getchildren()
         entryElements = []
         for currElement in rawElements:
-            if 'entry' in currElement.tag:
+            if "entry" in currElement.tag:
                 entryElements.append(currElement)
-        assert len(entryElements) == self.maxResults, 'Number of entry elements found != max results. # Entry elements = {} and max results = {}'.format(
-            len(entryElements), self.maxResults)
+        assert (
+            len(entryElements) == self.maxResults
+        ), "Number of entry elements found != max results. # Entry elements = {} and max results = {}".format(
+            len(entryElements), self.maxResults
+        )
         return entryElements
 
     def extractPaperPdfURLsFromEntries(self, entries):
@@ -28,14 +31,16 @@ class ArxivXMLParser(object):
     def extractPdfUrlsFromPdfElements(self, allPdfElements):
         pdfUrlDict = {}
         for elemIndex, currPdfElem in enumerate(allPdfElements):
-            pdfUrlDict['{}_{}'.format(self.queryEntry, elemIndex)] = [currPdfElem.attrib['href']]
+            pdfUrlDict["{}_{}".format(self.queryEntry, elemIndex)] = [
+                currPdfElem.attrib["href"]
+            ]
         return pdfUrlDict
 
     def findLinkElements(self, entries):
         linkElements = []
         for currEntry in entries:
             currEntryChildren = self.getEntryElementChildren(currEntry)
-            candidateLinks = self.findElementTypeFromChildren(currEntryChildren, 'link')
+            candidateLinks = self.findElementTypeFromChildren(currEntryChildren, "link")
             selectedLink = self.selectValidLinkElement(candidateLinks)
             linkElements.append(selectedLink)
         return linkElements
@@ -44,10 +49,13 @@ class ArxivXMLParser(object):
         validLinkElements = []
         for currLink in candidateLinks:
             linkAttributes = currLink.attrib
-            if 'href' in linkAttributes and 'pdf' in linkAttributes['href']:
+            if "href" in linkAttributes and "pdf" in linkAttributes["href"]:
                 validLinkElements.append(currLink)
-        assert len(validLinkElements) == 1, 'Something went wrong! Filtering produced these many valid link elements = {}'.format(
-            validLinkElements)
+        assert (
+            len(validLinkElements) == 1
+        ), "Something went wrong! Filtering produced these many valid link elements = {}".format(
+            validLinkElements
+        )
         return validLinkElements[0]
 
     def extractSummariesFromEntries(self, elementTree, returnEntries=True):
@@ -61,14 +69,14 @@ class ArxivXMLParser(object):
     def extractSummaryTextFromSummary(self, summaryElements):
         summaryDict = {}
         for elemIndex, currSummary in enumerate(summaryElements):
-            summaryDict['{}_{}'.format(self.queryEntry, elemIndex)] = [currSummary.text]
+            summaryDict["{}_{}".format(self.queryEntry, elemIndex)] = [currSummary.text]
         return summaryDict
 
     def findSummaryElements(self, entryElements):
         summaryElements = []
         for currEntry in entryElements:
             currEntryChildren = self.getEntryElementChildren(currEntry)
-            currSummary = self.findElementTypeFromChildren(currEntryChildren, 'summary')
+            currSummary = self.findElementTypeFromChildren(currEntryChildren, "summary")
             summaryElements.append(currSummary)
         return summaryElements
 
@@ -85,4 +93,6 @@ class ArxivXMLParser(object):
         elif len(matchingChildren) > 1:
             return matchingChildren
         else:
-            raise AttributeError('Could not find any children matching {}!'.format(type))
+            raise AttributeError(
+                "Could not find any children matching {}!".format(type)
+            )

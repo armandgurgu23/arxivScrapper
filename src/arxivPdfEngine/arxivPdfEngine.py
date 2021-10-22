@@ -18,4 +18,4 @@ class ArxivPdfEngine(object):
 
     def extractPdfTextFromDocument(self, pdfFilePath):
         parsedPdf = parser.from_file(pdfFilePath)
-        return parsedPdf['content']
+        return parsedPdf["content"]

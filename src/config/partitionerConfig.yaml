@@ -1,0 +1,6 @@
+partitioner:
+  totalTrainSplit: 0.75
+  totalValidSplit: 0.1
+  totalTestSplit: 0.15
+  partitionOutputPath: 'partitionedDataset'
+
