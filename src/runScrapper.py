@@ -32,7 +32,9 @@ class ScrapperHandler(object):
                 self.scrapperArgs, yamlType="partitioner"
             )
             partitionerObject = self.getDatasetPartitionerWrapper(
-                partitionerYamlConfig, yamlConfig.datasetGenerator.outputPath
+                partitionerYamlConfig,
+                yamlConfig.datasetGenerator.outputPath,
+                arxivQueryEngineObject.queriesToFetch,
             )
             partitionerObject()
         elif self.scrapperArgs.partitionDataset and not os.path.exists(
@@ -48,7 +50,9 @@ class ScrapperHandler(object):
                 self.scrapperArgs, yamlType="partitioner"
             )
             partitionerObject = self.getDatasetPartitionerWrapper(
-                partitionerYamlConfig, yamlConfig.datasetGenerator.outputPath
+                partitionerYamlConfig,
+                yamlConfig.datasetGenerator.outputPath,
+                arxivQueryEngineObject.queriesToFetch,
             )
             partitionerObject()
         else:
@@ -89,9 +93,13 @@ class ScrapperHandler(object):
         )
         return
 
-    def getDatasetPartitionerWrapper(self, partitionerConfig, datasetPath):
+    def getDatasetPartitionerWrapper(
+        self, partitionerConfig, datasetPath, queriesToPartition
+    ):
         return DatasetPartitioner(
-            partitionerConfig=partitionerConfig, datasetPath=datasetPath
+            partitionerConfig=partitionerConfig,
+            datasetPath=datasetPath,
+            queriesToPartition=queriesToPartition,
         )
 
     def getYamlConfigFileWrapper(self, scrapperArgs, yamlType="scrapper"):

@@ -8,6 +8,8 @@ def getPartitionerDefaults():
     _C.partitioner.totalValidSplit = 0.1
     _C.partitioner.totalTestSplit = 0.1
     _C.partitioner.partitionOutputPath = ""
+    _C.partitioner.minCategorySamplesPerSplit = 0
+    _C.partitioner.partitionSeed = 0
     _C.partitioner.superCategory = CN()
     return _C
 

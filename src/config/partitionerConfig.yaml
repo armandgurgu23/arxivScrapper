@@ -3,4 +3,6 @@ partitioner:
   totalValidSplit: 0.1
   totalTestSplit: 0.15
   partitionOutputPath: 'partitionedDataset'
+  minCategorySamplesPerSplit: 1
+  partitionSeed: 11949
 
