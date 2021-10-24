@@ -25,7 +25,7 @@ class ScrapperHandler(object):
             outputPath=yamlConfig.datasetGenerator.outputPath
         )
         arxivPdfEngineObject = self.getArxivPdfEngineWrapper()
-        if self.scrapperArgs.partitionDataset and os.path.exists(
+        if self.scrapperArgs.partitionDataset and os.listdir(
             yamlConfig.datasetGenerator.outputPath
         ):
             partitionerYamlConfig = self.getYamlConfigFileWrapper(
@@ -37,7 +37,7 @@ class ScrapperHandler(object):
                 arxivQueryEngineObject.queriesToFetch,
             )
             partitionerObject()
-        elif self.scrapperArgs.partitionDataset and not os.path.exists(
+        elif self.scrapperArgs.partitionDataset and not os.listdir(
             yamlConfig.datasetGenerator.outputPath
         ):
             self.runScraperAndGenerateDataset(

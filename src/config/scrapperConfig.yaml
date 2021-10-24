@@ -1,6 +1,6 @@
 queryEngine:
   queryFile: 'queryEngine/queryFiles/sampleQueryFile.txt'
-  maxResults: 10
+  maxResults: 50
   requestPauseTime: 2
 datasetGenerator:
   outputPath: 'scrapedDataset'
